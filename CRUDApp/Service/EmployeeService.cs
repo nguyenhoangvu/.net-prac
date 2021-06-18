@@ -37,6 +37,9 @@ namespace CRUDApp.Service
                 _employeeDbContext.SaveChanges();
             }
         }
-        //public Employee Get
+        public Employee GetEmployee(int Id)
+        {
+            return _employeeDbContext.Employees.FirstOrDefault(x => x.Id == Id);
+        }
     }
 }
