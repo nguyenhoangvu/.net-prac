@@ -1,22 +1,16 @@
+using CoreProject.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using TutorialCRUD.Models;
-using TutorialCRUD.Helpers;
-using TutorialCRUD.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace TutorialCRUD
+namespace CoreProject
 {
     public class Startup
     {
@@ -30,10 +24,9 @@ namespace TutorialCRUD
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddDbContext<TodoContext>(opt =>
-               opt.UseInMemoryDatabase("TodoList"));
-            services.AddControllers();
+            string connectionstring = Configuration.GetConnectionString("EmployeeConnection");
+            services.AddDbContext<EmployeeContext>(options => options.UseSqlServer(connectionstring));
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,8 +36,11 @@ namespace TutorialCRUD
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseHttpsRedirection();
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
+            app.UseStaticFiles();
 
             app.UseRouting();
 
@@ -52,7 +48,9 @@ namespace TutorialCRUD
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
